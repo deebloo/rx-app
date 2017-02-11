@@ -10,6 +10,7 @@ import { Observable } from 'rxjs/Observable';
 
 
 
+
 // Define Manager and actions
 class ToDo {
   constructor(public title: string, public completed = false) { }
@@ -37,6 +38,7 @@ const addTodo = (manager, todo: ToDo) => {
 const removeTodo = (manager, index: number) => {
   return actions(manager)(todos => todos.filter((item, i) => i !== index));
 }
+
 
 
 
@@ -71,12 +73,16 @@ class TodoList extends HTMLElement {
     this.list.appendChild(li);
   }
 
+  removeTodo(id) {
+    return removeTodo(this.todos, id).subscribe();
+  }
+
   private createTodoButton(id) {
     const button = document.createElement('button');
     button.id = id;
     button.textContent = 'X';
     button.onclick = e => {
-      removeTodo(this.todos, parseInt(e.target['id'], 10)).subscribe();
+      this.removeTodo(parseInt(e.target['id'], 10));
     };
 
     return button;
@@ -97,6 +103,7 @@ const TodoListEl = window['customElements'].define('todo-list', TodoList);
 
 
 
+
 // Create instance of list and add to body
 const myList1 = document.createElement('todo-list') as TodoList;
 myList1.todos = manager;
@@ -107,6 +114,7 @@ myList2.todos = manager;
 document.body.appendChild(myList1);
 document.body.appendChild(document.createElement('hr'));
 document.body.appendChild(myList2);
+
 
 
 
