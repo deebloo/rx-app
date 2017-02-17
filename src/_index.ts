@@ -1,13 +1,12 @@
-import { BehaviorSubject, Subject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
-const manager: BehaviorSubject<any[]> = new BehaviorSubject(['Get Milk', 'Work Out']);
-const manager2: BehaviorSubject<any[]> = new BehaviorSubject(['Take questions']);
+const manager = new BehaviorSubject(['Get Milk', 'Work out']);
 
 const action = (manager, fn) => {
   return manager
     .first()
-    .do(res => manager.next(fn(res)));
-};
+    .do(todos => manager.next(fn(todos)));
+}
 
 const addTodoAction = (manager, todo: string) => {
   return action(manager, todos => [...todos, todo]);
@@ -15,9 +14,10 @@ const addTodoAction = (manager, todo: string) => {
 
 const removeTodoAction = (manager, index: number) => {
   return action(manager, todos => {
-    return todos.filter((item, i) => i !== index);
+    return todos.filter((item, i) => i !== index)
   });
 }
+
 
 
 
@@ -25,9 +25,7 @@ const removeTodoAction = (manager, index: number) => {
 // Define Todo element
 class TodoList extends HTMLElement {
   // The Input accepts an observables that results in a string array
-  todos: BehaviorSubject<string[]>;
-
-  changed = new Subject();
+  todos;
 
   // we create a ul element
   private list: HTMLUListElement = document.createElement('ul');
@@ -63,8 +61,6 @@ class TodoList extends HTMLElement {
     button.id = id;
     button.textContent = 'X';
     button.onclick = e => {
-      this.changed.next();
-
       this.removeTodo(parseInt(e.target['id'], 10));
     };
 
@@ -89,12 +85,9 @@ window['customElements'].define('todo-list', TodoList);
 // Create instance of list and add to body
 const myList1 = document.createElement('todo-list') as TodoList;
 myList1.todos = manager;
-myList1.changed.subscribe(() => {
-  alert('test');
-});
 
 const myList2 = document.createElement('todo-list') as TodoList;
-myList2.todos = manager2;
+myList2.todos = manager;
 
 document.body.appendChild(myList1);
 document.body.appendChild(document.createElement('hr'));
@@ -116,5 +109,3 @@ form.onsubmit = e => {
     input['value'] = '';
   });
 }
-
-
